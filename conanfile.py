@@ -1,5 +1,5 @@
 from conans import ConanFile, CMake
-from conans.tools import get, replace_in_file
+from conans.tools import get, replace_in_file, SystemPackageTool
 import os, shutil
 
 class SDL2PrebuiltConan(ConanFile):
@@ -7,10 +7,17 @@ class SDL2PrebuiltConan(ConanFile):
     description = 'SDL2 binaries'
     version = "any"
     folders = []
-    settings = "os", "arch", "compiler"
+    settings = "os", "arch"
     generators = "cmake"
     url = "http://github.com/sixten-hilborn/conan-sdl2_prebuilt"
     license = "Zlib - https://en.wikipedia.org/wiki/Zlib_License"
+
+    def system_requirements(self):
+        if self.settings.os == "Linux":
+            installer = SystemPackageTool()
+            installer.update()
+            for package in ["libsdl2-dev", "libsdl2-mixer-dev", "libsdl2-image-dev", "libsdl2-gfx-dev", "libsdl2-ttf-dev"]:
+                installer.install(package)
 
     def source(self):
         if self.settings.os == "Windows":
@@ -21,10 +28,7 @@ class SDL2PrebuiltConan(ConanFile):
             get("https://github.com/sixten-hilborn/SDL2_gfx-prebuilt/raw/master/SDL2_gfx-devel-1.0.1-VC.zip")
 
     def build(self):
-        if self.settings.os == "Linux":
-            # TODO: Should check if the packages are already installed
-            self.run("sudo apt-get update && sudo apt-get install -y libsdl2-dev libsdl2-mixer-dev libsdl2-image-dev libsdl2-gfx-dev libsdl2-ttf-dev")
-        elif self.settings.os == "Windows":
+        if self.settings.os == "Windows":
             self.folders = [
                 'SDL2-2.0.5',
                 'SDL2_mixer-2.0.1',
@@ -32,6 +36,8 @@ class SDL2PrebuiltConan(ConanFile):
                 'SDL2_ttf-2.0.14',
                 'SDL2_gfx-1.0.1'
             ]
+        elif self.settings.os == "Linux":
+            pass
         else:
             raise Exception(str(self.settings.os) + ' is not yet supported')
         
