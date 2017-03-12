@@ -62,6 +62,7 @@ class SDL2PrebuiltConan(ConanFile):
     def package_info(self):
         if self.settings.os == 'Macos':
             frameworks = [
+                "-iframework /Library/Frameworks",
                 "-framework SDL2",
                 "-framework SDL2_image",
                 "-framework SDL2_mixer",
