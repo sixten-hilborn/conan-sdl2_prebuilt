@@ -1,6 +1,5 @@
-from conans import ConanFile, CMake
-from conans.tools import get, download, replace_in_file, SystemPackageTool
-import os, shutil
+from conans import ConanFile
+from conans.tools import get, download, SystemPackageTool
 
 class SDL2PrebuiltConan(ConanFile):
     name = "SDL2_prebuilt"
@@ -74,5 +73,10 @@ class SDL2PrebuiltConan(ConanFile):
             self.cpp_info.sharedlinkflags = self.cpp_info.exelinkflags
         else:
             self.cpp_info.libs = ["SDL2", "SDL2_mixer", "SDL2_image", "SDL2_ttf", "SDL2_gfx"]
+
+        if self.settings.os != 'Windows':
+            self.cpp_info.includedirs = []
+            self.cpp_info.libdirs = []
+
         # Workaround to skip dat SDL2main stuff
         self.cpp_info.defines = ["_SDL_main_h"]
